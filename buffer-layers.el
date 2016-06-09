@@ -69,7 +69,7 @@
        (list ',applier ',remover))))
 
 (defun load-buffer-layer (name-or-path load-it-p)
-  "Load a buffer named NAME-OR-PATH, and if a file, apply if LOAD-IT is true."
+  "Load a buffer named NAME-OR-PATH, and if a file, apply if LOAD-IT-P is true."
   (interactive (list (completing-read "Buffer Layer Name or Path: " (remove-if #'(lambda (layer)
                                                                                    (member layer *buffer-layers-applied*))
                                                                                *buffer-layers*))
