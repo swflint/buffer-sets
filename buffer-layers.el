@@ -33,6 +33,7 @@
   (intern (format "*buffer-layer-%s-buffers*" name)))
 
 (cl-defmacro define-buffer-layer (name &key files run-on-apply run-on-remove buffer-to-select)
+  "Define a buffer layer named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
   (let ((applier (buffer-layer--applier-name name))
         (remover (buffer-layer--remover-name name))
         (buffers-list (buffer-layer--buffer-list-name name))
