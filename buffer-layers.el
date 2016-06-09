@@ -90,6 +90,15 @@
   (interactive (list (completing-read "Buffer Layer Name: " *buffer-layers-applied*)))
   (funcall (buffer-layer--remover-name name)))
 
+(defun buffer-layer-list ()
+  "Produce a list of defined buffer layers."
+  (interactive)
+  (with-help-window "*Buffer Layers*"
+    (with-current-buffer "*Buffer Layers*"
+      (insert "Defined Buffer Layers:\n\n")
+      (dolist (layer *buffer-layers*)
+        (insert (format " - %s\n" layer))))))
+
 (defun unload-all-buffer-layers ()
   "Unload all loaded buffer layers."
   (interactive)
@@ -100,6 +109,7 @@
   "Keymap for buffer-layer commands.")
 
 (define-key buffer-layer-map (kbd "l") #'load-buffer-layer)
+(define-key buffer-layer-map (kbd "L") #'buffer-layer-list)
 (define-key buffer-layer-map (kbd "u") #'unload-buffer-layer)
 (define-key buffer-layer-map (kbd "U") #'unload-all-buffer-layers)
 
