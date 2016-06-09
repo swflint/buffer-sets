@@ -99,6 +99,8 @@
 
 (global-set-key (kbd "C-x L") buffer-layer-map)
 
+(add-hook 'kill-emacs-hook #'unload-all-buffer-layers)
+
 (provide 'buffer-layers)
 
 ;;; buffer-layers.el ends here
