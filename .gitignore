@@ -3,3 +3,11 @@
 
 # Packaging
 .cask
+
+# Backup
+*~
+\#*\#
+
+# Other
+.*
+!.git*
