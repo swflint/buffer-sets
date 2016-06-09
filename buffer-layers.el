@@ -16,9 +16,11 @@
 
 (require 'cl)
 
-(defvar *buffer-layers* nil)
+(defvar *buffer-layers* nil
+  "List of all defined buffer layers.")
 
-(defvar *buffer-layers-applied* nil)
+(defvar *buffer-layers-applied* nil
+  "List of applied buffer-layers.")
 
 (defun buffer-layer--applier-name (name)
   "Generate name to apply a buffer layer based on NAME."
@@ -94,7 +96,8 @@
   (dolist (buffer-layer *buffer-layers-applied*)
     (unload-buffer-layer buffer-layer)))
 
-(defvar buffer-layer-map (make-keymap))
+(defvar buffer-layer-map (make-keymap)
+  "Keymap for buffer-layer commands.")
 
 (define-key buffer-layer-map (kbd "l") #'load-buffer-layer)
 (define-key buffer-layer-map (kbd "u") #'unload-buffer-layer)
