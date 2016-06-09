@@ -22,6 +22,10 @@
 (defvar *buffer-layers-applied* nil
   "List of applied buffer-layers.")
 
+(defun buffer-layer-applied-p (layer)
+  "Returns true if LAYER is applied."
+  (member layer *buffer-layers-applied*))
+
 (defun buffer-layer--applier-name (name)
   "Generate name to apply a buffer layer based on NAME."
   (intern (format "apply-buffer-layer-%s" name)))
@@ -94,10 +98,13 @@
   "Produce a list of defined buffer layers."
   (interactive)
   (with-help-window "*Buffer Layers*"
+    (when (buffer-live-p "*Buffer Layers*")
+      (kill-buffer "*Buffer Layers*"))
     (with-current-buffer "*Buffer Layers*"
       (insert "Defined Buffer Layers:\n\n")
       (dolist (layer *buffer-layers*)
-        (insert (format " - %s\n" layer))))))
+        (insert (format " - %s%s\n" layer (if (buffer-layer-applied-p layer) " (Applied)"
+                                            "")))))))
 
 (defun unload-all-buffer-layers ()
   "Unload all loaded buffer layers."
