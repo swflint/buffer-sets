@@ -31,7 +31,7 @@
 
 (defun buffer-layer-defined-p (layer)
   "Returns true if LAYER is defined."
-  (member layer *buffer-layers*))
+  (null (member layer *buffer-layers*)))
 
 (defun buffer-layer--buffer-list-name (name)
   "Generate name to contain buffer layer buffer list based on NAME."
@@ -52,12 +52,8 @@
                     '(,name
                       ,files
                       ,buffer-to-select
-                      (lambda ()
-                        ,@run-on-apply
-                        nil)
-                      (lambda ()
-                        ,@run-on-remove
-                        nil)))
+                      ,run-on-apply
+                      ,run-on-remove))
        ;; (defun ,applier ()
        ;;   ,(format "Apply buffer-layer %s." name)
        ;;   (interactive)
@@ -100,7 +96,7 @@
                     (add-to-list (buffer-layer--buffer-list-name name-or-path)
                                  (find-file file)))
                 files-list)
-        (funcall on-apply)
+        (funcall (eval `(lambda () #'on-apply nil)))
         (when (not (null selected))
           (switch-to-buffer selected))
         (add-to-list '*buffer-layers-applied* name-or-path)
@@ -122,7 +118,7 @@
           (symbol-value (buffer-layer--buffer-list-name name)))
     (setq (buffer-layer--buffer-list-name name) nil)
     (setq *buffer-layers-applied* (delq name *buffer-layers-applied*))
-    (funcall on-remove)
+    (funcall (eval `(lambda () ,@on-remove nil)))
     (message "Removed Buffer Layer %s." name)))
 
 (defun buffer-layer-list ()
