@@ -22,17 +22,16 @@
 (defvar *buffer-layers-applied* nil
   "List of applied buffer-layers.")
 
+(defun *buffer-layer-definitions* nil
+  "List of buffer layer definitions.")
+
 (defun buffer-layer-applied-p (layer)
   "Returns true if LAYER is applied."
   (member layer *buffer-layers-applied*))
 
-(defun buffer-layer--applier-name (name)
-  "Generate name to apply a buffer layer based on NAME."
-  (intern (format "apply-buffer-layer-%s" name)))
-
-(defun buffer-layer--remover-name (name)
-  "Generate name to remove a buffer layer based on NAME."
-  (intern (format "remove-buffer-layer-%s" name)))
+(defun buffer-layer-defined-p (layer)
+  "Returns true if LAYER is defined."
+  (member layer *buffer-layers*))
 
 (defun buffer-layer--buffer-list-name (name)
   "Generate name to contain buffer layer buffer list based on NAME."
@@ -40,41 +39,48 @@
 
 (cl-defmacro define-buffer-layer (name &key files run-on-apply run-on-remove buffer-to-select)
   "Define a buffer layer named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
-  (let ((applier (buffer-layer--applier-name name))
-        (remover (buffer-layer--remover-name name))
-        (buffers-list (buffer-layer--buffer-list-name name))
-        (files-list (cons 'list
-                          (when (not (null files))
-                            (mapcar #'(lambda (name)
-                                        (format "%s" name)) files)))))
+  (let ((buffers-list (buffer-layer--buffer-list-name name))
+        ;; (files-list (cons 'list
+        ;;                   (when (not (null files))
+        ;;                     (mapcar #'(lambda (name)
+        ;;                                 (format "%s" name)) files))))
+        )
     `(progn
        (add-to-list '*buffer-layers* ',name)
        (defvar ,buffers-list nil)
-       (defun ,applier ()
-         ,(format "Apply buffer-layer %s." name)
-         (interactive)
-         (mapcar #'(lambda (file)
-                     (add-to-list ',buffers-list (find-file file)))
-                 ,files-list)
-         ,@run-on-apply
-         (when (not (null ,buffer-to-select))
-           (switch-to-buffer ,buffer-to-select))
-         (add-to-list '*buffer-layers-applied* ',name)
-         (message "Applied Buffer Layer %s" ',name))
-       (defun ,remover ()
-         ,(format "Remove buffer-layer %s." name)
-         (interactive)
-         (mapc #'(lambda (buffer)
-                   (when (buffer-live-p buffer)
-                     (with-current-buffer buffer
-                       (save-buffer)
-                       (kill-buffer))))
-               ,buffers-list)
-         ,@run-on-remove
-         (setq ,buffers-list nil)
-         (setq *buffer-layers-applied* (delq ',name *buffer-layers-applied*))
-         (message "Removed Buffer Layer %s" ',name))
-       (setq current-buffer-applier ',applier)
+       (add-to-list '*buffer-layer-definitions*
+                    '(,name
+                      ,files
+                      ,buffer-to-select
+                      #'(lambda ()
+                          ,@run-on-apply)
+                      #'(lambda ()
+                          ,@run-on-remove)))
+       ;; (defun ,applier ()
+       ;;   ,(format "Apply buffer-layer %s." name)
+       ;;   (interactive)
+       ;;   (mapcar #'(lambda (file)
+       ;;               (add-to-list ',buffers-list (find-file file)))
+       ;;           ,files-list)
+       ;;   ,@run-on-apply
+       ;;   (when (not (null ,buffer-to-select))
+       ;;     (switch-to-buffer ,buffer-to-select))
+       ;;   (add-to-list '*buffer-layers-applied* ',name)
+       ;;   (message "Applied Buffer Layer %s" ',name))
+       ;; (defun ,remover ()
+       ;;   ,(format "Remove buffer-layer %s." name)
+       ;;   (interactive)
+       ;;   (mapc #'(lambda (buffer)
+       ;;             (when (buffer-live-p buffer)
+       ;;               (with-current-buffer buffer
+       ;;                 (save-buffer)
+       ;;                 (kill-buffer))))
+       ;;         ,buffers-list)
+       ;;   ,@run-on-remove
+       ;;   (setq ,buffers-list nil)
+       ;;   (setq *buffer-layers-applied* (delq ',name *buffer-layers-applied*))
+       ;;   (message "Removed Buffer Layer %s" ',name))
+       (setq current-buffer-layer ',name)
        (list ',applier ',remover))))
 
 (defun load-buffer-layer (name-or-path load-it-p)
@@ -83,16 +89,39 @@
                                                                                       (member layer *buffer-layers-applied*))
                                                                                   *buffer-layers*))
                      nil))
-  (if (functionp (buffer-layer--applier-name name-or-path))
-      (funcall (buffer-layer--applier-name name-or-path))
-    (load name-or-path)
-    (when load-it-p
-      (funcall current-buffer-applier))))
+  (if (buffer-layer-defined-p name-or-path)
+      (let* ((record (assoc name-or-path *buffer-layer-definitions*))
+             (files-list (nth 1 record))
+             (selected (nth 2 record))
+             (on-apply (nth 3 record)))
+        (mapcar #'(lambda (file)
+                    (add-to-list (buffer-layer--buffer-list-name name-or-path)
+                                 (find-file file)))
+                files-list)
+        (funcall on-apply)
+        (when (not (null selected))
+          (switch-to-buffer selected))
+        (add-to-list '*buffer-layers-applied* name-or-path)
+        (message "Applied buffer layer %s." name-or-path))
+    (progn
+      (load name-or-path)
+      (when load-it-p
+        (load-buffer-layer current-buffer-layer t)))))
 
 (defun unload-buffer-layer (name)
   "Unload Buffer Layer named NAME."
   (interactive (list (completing-read "Buffer Layer Name: " *buffer-layers-applied*)))
-  (funcall (buffer-layer--remover-name name)))
+  (let ((on-remove (nth 4 (assoc name *buffer-layer-definitions*))))
+    (mapc #'(lambda (buffer)
+              (when (buffer-live-p buffer)
+                (with-current-buffer buffer
+                  (save-buffer)
+                  (kill-buffer))))
+          (symbol-value (buffer-layer--buffer-list-name name)))
+    (setq (buffer-layer--buffer-list-name name) nil)
+    (setq *buffer-layers-applied* (delq name *buffer-layers-applied*))
+    (funcall on-remove)
+    (message "Removed Buffer Layer %s." name)))
 
 (defun buffer-layer-list ()
   "Produce a list of defined buffer layers."
