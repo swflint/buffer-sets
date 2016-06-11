@@ -81,7 +81,7 @@
        ;;   (setq *buffer-layers-applied* (delq ',name *buffer-layers-applied*))
        ;;   (message "Removed Buffer Layer %s" ',name))
        (setq current-buffer-layer ',name)
-       (list ',applier ',remover))))
+       ',name)))
 
 (defun load-buffer-layer (name-or-path load-it-p)
   "Load a buffer named NAME-OR-PATH, and if a file, apply if LOAD-IT-P is true."
