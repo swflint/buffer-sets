@@ -52,12 +52,12 @@
                     '(,name
                       ,files
                       ,buffer-to-select
-                      #'(lambda ()
-                          ,@run-on-apply
-                          nil)
-                      #'(lambda ()
-                          ,@run-on-remove
-                          nil)))
+                      (lambda ()
+                        ,@run-on-apply
+                        nil)
+                      (lambda ()
+                        ,@run-on-remove
+                        nil)))
        ;; (defun ,applier ()
        ;;   ,(format "Apply buffer-layer %s." name)
        ;;   (interactive)
