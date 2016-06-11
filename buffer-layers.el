@@ -53,9 +53,11 @@
                       ,files
                       ,buffer-to-select
                       #'(lambda ()
-                          ,@run-on-apply)
+                          ,@run-on-apply
+                          nil)
                       #'(lambda ()
-                          ,@run-on-remove)))
+                          ,@run-on-remove
+                          nil)))
        ;; (defun ,applier ()
        ;;   ,(format "Apply buffer-layer %s." name)
        ;;   (interactive)
