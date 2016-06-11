@@ -102,9 +102,12 @@
       (kill-buffer "*Buffer Layers*"))
     (with-current-buffer "*Buffer Layers*"
       (insert "Defined Buffer Layers:\n\n")
-      (dolist (layer *buffer-layers*)
-        (insert (format " - %s%s\n" layer (if (buffer-layer-applied-p layer) " (Applied)"
-                                            "")))))))
+      (insert (with-temp-buffer
+                (dolist (layer *buffer-layers*)
+                  (insert (format " - %s%s\n" layer (if (buffer-layer-applied-p layer) " (Applied)"
+                                                      ""))))
+                (sort-lines nil (buffer-end -1) (buffer-end +1))
+                (buffer-string))))))
 
 (defun unload-all-buffer-layers ()
   "Unload all loaded buffer layers."
