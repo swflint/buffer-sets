@@ -120,9 +120,16 @@
 (define-key buffer-layer-map (kbd "u") #'unload-buffer-layer)
 (define-key buffer-layer-map (kbd "U") #'unload-all-buffer-layers)
 
-(global-set-key (kbd "C-x L") buffer-layer-map)
-
-(add-hook 'kill-emacs-hook #'unload-all-buffer-layers)
+(define-minor-mode buffer-layer-mode
+  "A mode for managing layers of buffers."
+  :lighter " BLM" :global t :variable buffer-layer-mode-p
+  (if buffer-layer-mode-p
+      (progn
+        (define-key ctl-x-map (kbd "L") buffer-layer-map)
+        (add-hook 'kill-emacs-hook #'unload-all-buffer-layers))
+    (progn
+      (define-key ctl-x-map (kbd "L") nil)
+      (remove-hook 'kill-emacs-hook #'unload-all-buffer-layers))))
 
 (provide 'buffer-layers)
 
