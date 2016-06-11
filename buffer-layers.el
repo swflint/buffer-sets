@@ -4,7 +4,7 @@
 
 ;; Author: Samuel W. Flint <swflint@flintfam.org>
 ;; Version: 1.0
-;; Package-Requires: (cl)
+;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: buffer-management
 ;; URL: http://github.com/swflint/buffer-layers
 
@@ -14,7 +14,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(require 'cl-lib)
 
 (defvar *buffer-layers* nil
   "List of all defined buffer layers.")
@@ -79,9 +79,9 @@
 
 (defun load-buffer-layer (name-or-path load-it-p)
   "Load a buffer named NAME-OR-PATH, and if a file, apply if LOAD-IT-P is true."
-  (interactive (list (completing-read "Buffer Layer Name or Path: " (remove-if #'(lambda (layer)
-                                                                                   (member layer *buffer-layers-applied*))
-                                                                               *buffer-layers*))
+  (interactive (list (completing-read "Buffer Layer Name or Path: " (cl-remove-if #'(lambda (layer)
+                                                                                      (member layer *buffer-layers-applied*))
+                                                                                  *buffer-layers*))
                      nil))
   (if (functionp (buffer-layer--applier-name name-or-path))
       (funcall (buffer-layer--applier-name name-or-path))
