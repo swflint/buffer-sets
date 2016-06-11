@@ -22,7 +22,7 @@
 (defvar *buffer-layers-applied* nil
   "List of applied buffer-layers.")
 
-(defun *buffer-layer-definitions* nil
+(defvar *buffer-layer-definitions* nil
   "List of buffer layer definitions.")
 
 (defun buffer-layer-applied-p (layer)
