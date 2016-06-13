@@ -98,7 +98,7 @@
     (when load-it-p
       (funcall current-buffer-applier))))
 
-(defalias load-buffer-layer buffer-layers-load-buffer-layer)
+(defalias 'load-buffer-layer 'buffer-layers-load-buffer-layer)
 
 (defun buffer-layers-unload-buffer-layer (name)
   "Unload Buffer Layer named NAME."
