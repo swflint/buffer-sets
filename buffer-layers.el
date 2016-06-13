@@ -22,27 +22,27 @@
 (defvar *buffer-layers-applied* nil
   "List of applied buffer-layers.")
 
-(defun buffer-layer-applied-p (layer)
+(defun buffer-layers-applied-p (layer)
   "Returns true if LAYER is applied."
   (member layer *buffer-layers-applied*))
 
-(defun buffer-layer--applier-name (name)
+(defun buffer-layers--applier-name (name)
   "Generate name to apply a buffer layer based on NAME."
-  (intern (format "apply-buffer-layer-%s" name)))
+  (intern (format "apply-buffer-layers-%s" name)))
 
-(defun buffer-layer--remover-name (name)
+(defun buffer-layers--remover-name (name)
   "Generate name to remove a buffer layer based on NAME."
-  (intern (format "remove-buffer-layer-%s" name)))
+  (intern (format "remove-buffer-layers-%s" name)))
 
-(defun buffer-layer--buffer-list-name (name)
+(defun buffer-layers--buffer-list-name (name)
   "Generate name to contain buffer layer buffer list based on NAME."
-  (intern (format "*buffer-layer-%s-buffers*" name)))
+  (intern (format "*buffer-layers-%s-buffers*" name)))
 
 (cl-defmacro define-buffer-layer (name &key files run-on-apply run-on-remove buffer-to-select)
   "Define a buffer layer named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
-  (let ((applier (buffer-layer--applier-name name))
-        (remover (buffer-layer--remover-name name))
-        (buffers-list (buffer-layer--buffer-list-name name))
+  (let ((applier (buffer-layers--applier-name name))
+        (remover (buffer-layers--remover-name name))
+        (buffers-list (buffer-layers--buffer-list-name name))
         (files-list (cons 'list
                           (when (not (null files))
                             (mapcar #'(lambda (name)
@@ -77,24 +77,26 @@
        (setq current-buffer-applier ',applier)
        (list ',applier ',remover))))
 
-(defun load-buffer-layer (name-or-path load-it-p)
+(defun buffer-layers-load-buffer-layer (name-or-path load-it-p)
   "Load a buffer named NAME-OR-PATH, and if a file, apply if LOAD-IT-P is true."
   (interactive (list (completing-read "Buffer Layer Name or Path: " (cl-remove-if #'(lambda (layer)
                                                                                       (member layer *buffer-layers-applied*))
                                                                                   *buffer-layers*))
                      nil))
-  (if (functionp (buffer-layer--applier-name name-or-path))
-      (funcall (buffer-layer--applier-name name-or-path))
+  (if (functionp (buffer-layers--applier-name name-or-path))
+      (funcall (buffer-layers--applier-name name-or-path))
     (load name-or-path)
     (when load-it-p
       (funcall current-buffer-applier))))
 
-(defun unload-buffer-layer (name)
+(defalias load-buffer-layer buffer-layers-load-buffer-layer)
+
+(defun buffer-layers-unload-buffer-layer (name)
   "Unload Buffer Layer named NAME."
   (interactive (list (completing-read "Buffer Layer Name: " *buffer-layers-applied*)))
-  (funcall (buffer-layer--remover-name name)))
+  (funcall (buffer-layers--remover-name name)))
 
-(defun buffer-layer-list ()
+(defun buffer-layers-list ()
   "Produce a list of defined buffer layers."
   (interactive)
   (with-help-window "*Buffer Layers*"
@@ -104,35 +106,35 @@
       (insert "Defined Buffer Layers:\n\n")
       (insert (with-temp-buffer
                 (dolist (layer *buffer-layers*)
-                  (insert (format " - %s%s\n" layer (if (buffer-layer-applied-p layer) " (Applied)"
+                  (insert (format " - %s%s\n" layer (if (buffer-layers-applied-p layer) " (Applied)"
                                                       ""))))
                 (sort-lines nil (buffer-end -1) (buffer-end +1))
                 (buffer-string))))))
 
-(defun unload-all-buffer-layers ()
+(defun buffer-layers-unload-all-buffer-layers ()
   "Unload all loaded buffer layers."
   (interactive)
   (dolist (buffer-layer *buffer-layers-applied*)
     (unload-buffer-layer buffer-layer)))
 
-(defvar buffer-layer-map (make-keymap)
+(defvar buffer-layers-map (make-keymap)
   "Keymap for buffer-layer commands.")
 
-(define-key buffer-layer-map (kbd "l") #'load-buffer-layer)
-(define-key buffer-layer-map (kbd "L") #'buffer-layer-list)
-(define-key buffer-layer-map (kbd "u") #'unload-buffer-layer)
-(define-key buffer-layer-map (kbd "U") #'unload-all-buffer-layers)
+(define-key buffer-layers-map (kbd "l") #'buffer-layers-load-buffer-layer)
+(define-key buffer-layers-map (kbd "L") #'buffer-layers-list)
+(define-key buffer-layers-map (kbd "u") #'buffer-layers-unload-buffer-layer)
+(define-key buffer-layers-map (kbd "U") #'buffer-layers-unload-all-buffer-layers)
 
-(define-minor-mode buffer-layer-mode
+(define-minor-mode buffer-layers-mode
   "A mode for managing layers of buffers."
-  :lighter " BLM" :global t :variable buffer-layer-mode-p
-  (if buffer-layer-mode-p
+  :lighter " BLM" :global t :variable buffer-layers-mode-p
+  (if buffer-layers-mode-p
       (progn
-        (define-key ctl-x-map (kbd "L") buffer-layer-map)
-        (add-hook 'kill-emacs-hook #'unload-all-buffer-layers))
+        (define-key ctl-x-map (kbd "L") buffer-layers-map)
+        (add-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers))
     (progn
       (define-key ctl-x-map (kbd "L") nil)
-      (remove-hook 'kill-emacs-hook #'unload-all-buffer-layers))))
+      (remove-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers))))
 
 (provide 'buffer-layers)
 
