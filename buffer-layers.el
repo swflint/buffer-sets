@@ -124,7 +124,7 @@
   "Unload all loaded buffer layers."
   (interactive)
   (dolist (buffer-layer *buffer-layers-applied*)
-    (unload-buffer-layer buffer-layer)))
+    (buffer-layers-unload-buffer-layer buffer-layer)))
 
 (defvar buffer-layers-map (make-keymap)
   "Keymap for buffer-layer commands.")
