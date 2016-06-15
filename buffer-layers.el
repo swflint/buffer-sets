@@ -158,6 +158,38 @@
   (dolist (buffer-layer *buffer-layers-applied*)
     (buffer-layers-unload-buffer-layer buffer-layer)))
 
+(defun buffer-layers-create-layer (name)
+  "Create a new layer."
+  (interactive "SNew Layer Name: "))
+
+(defun buffer-layers-add-file-to-layer (name file)
+  "Add a file to the layer."
+  (interactive (list
+                (completing-read "Layer: " *buffer-layers* nil t)
+                (read-file-name "File Name: "))))
+
+(defun buffer-layers-add-buffer-to-layer (name buffer)
+  "Add a buffer to the given layer."
+  (interactive (list
+                (completing-read "Layer: " *buffer-layers* nil t)
+                (read-buffer "Buffer: " (current-buffer)))))
+
+(defun buffer-layers-edit-load-actions (layer)
+  "Edit the actions to be preformed on buffer layer load."
+  (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
+
+(defun buffer-layers-edit-remove-actions (layer)
+  "Edit the actions to be preformed on buffer layer removal."
+  (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
+
+(defun buffer-layers-set-buffer-to-select (layer)
+  "Set the buffer to automatically select."
+  (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
+
+(defun buffer-layers-save ()
+  "Save defined buffer layers."
+  (interactive))
+
 (defvar buffer-layers-map (make-keymap)
   "Keymap for buffer-layer commands.")
 
@@ -165,6 +197,13 @@
 (define-key buffer-layers-map (kbd "L") #'buffer-layers-list)
 (define-key buffer-layers-map (kbd "u") #'buffer-layers-unload-buffer-layer)
 (define-key buffer-layers-map (kbd "U") #'buffer-layers-unload-all-buffer-layers)
+(define-key buffer-layers-map (kbd "c") #'buffer-layers-create-layer)
+(define-key buffer-layers-map (kbd "f") #'buffer-layers-add-file-to-layer)
+(define-key buffer-layers-map (kbd "b") #'buffer-layers-add-buffer-to-layer)
+(define-key buffer-layers-map (kbd "a") #'buffer-layers-edit-load-actions)
+(define-key buffer-layers-map (kbd "r") #'buffer-layers-edit-remove-actions)
+(define-key buffer-layers-map (kbd "s") #'buffer-layers-set-buffer-to-select)
+(define-key buffer-layers-map (kbd "C-s") #'buffer-layers-save)
 
 (define-minor-mode buffer-layers-mode
   "A mode for managing layers of buffers."
