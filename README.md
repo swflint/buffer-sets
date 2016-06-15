@@ -37,3 +37,5 @@ The following are the user-facing functions:
  - `buffer-layers-mode`
 
 On enabling `buffer-layer-mode`, the map is placed onto `C-x L`, and `buffer-layers-unload-all-buffer-layers` is added to the `kill-emacs-hook`, and on disabling the mode, they are removed.
+
+[![MELPA](https://melpa.org/packages/buffer-layers-badge.svg)](https://melpa.org/#/buffer-layers)
