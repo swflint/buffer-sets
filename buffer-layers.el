@@ -61,6 +61,15 @@
 (defvar *buffer-layers-applied* nil
   "List of applied buffer-layers.")
 
+(defvar *buffer-layer-definitions* nil
+  "List of all buffer layer definitions.")
+
+(defvar *buffer-layer-buffers* nil
+  "List of buffers in loaded buffer layers.")
+
+(defvar *buffer-layer-file* "~/.emacs.d/buffer-layer-definitions.el"
+  "The file to store buffer layer definitions in.")
+
 (defun buffer-layers-applied-p (layer)
   "Returns true if LAYER is applied."
   (member layer *buffer-layers-applied*))
@@ -115,6 +124,39 @@
          (message "Removed Buffer Layer %s" ',name))
        (setq current-buffer-applier ',applier)
        (list ',applier ',remover))))
+
+(cl-defmacro define-buffer-layer-new (name &key files run-on-apply run-on-remove buffer-to-select)
+  `(progn
+     (cl-pushnew '(,name
+                   (:files ,@files)
+                   (:on-apply ,@run-on-apply)
+                   (:on-remove ,@run-on-remove)
+                   ,@(when buffer-to-select
+                       (list :select-buffer buffer-to-select))
+                   ,@(when run-on-apply
+                       (list :on-apply-lambda (eval `(lambda () ,@run-on-apply))))
+                   ,@(when run-on-remove
+                       (list :on-remove-lambda (eval `(lambda () ,@run-on-remove)))))
+                 *buffer-layer-definitions* :key #'car)
+     (cl-pushnew ',name *buffer-layers*)
+     ',name))
+
+(defun buffer-layers-load-layer (name)
+  (interactive (list (completing-read "Layer Name: " *buffer-layers* ;; (cl-remove-if #'(lambda (layer) (member layer *buffer-layers-applied*)) *buffer-layers*)
+                                      nil t)))
+  (let* ((record (rest (assoc name *buffer-layer-definitions*)))
+         (files (rest (assoc :files record)))
+         (on-apply (rest (assoc :on-apply-lambda record)))
+         (buffer-select (rest (assoc :select-buffer record))))
+    (let ((buffer-list nil))
+      (dolist (file files)
+        (cl-pushnew (find-file file) buffer-list))
+      (add-to-list '*buffer-layer-buffers* `(,name ,@buffer-list)))
+    (when (functionp on-apply)
+      (funcall on-apply))
+    (when buffer-select
+      (switch-to-buffer buffer-select))
+    (message "Applied Buffer Layer %s." name)))
 
 (defun buffer-layers-load-buffer-layer (name-or-path load-it-p)
   "Load a buffer named NAME-OR-PATH, and if a file, apply if LOAD-IT-P is true."
