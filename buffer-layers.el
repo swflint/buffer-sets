@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016 Samuel Flint
 
 ;; Author: Samuel W. Flint <swflint@flintfam.org>
-;; Version: 1.5
+;; Version: 1.6
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: buffer-management
 ;; URL: http://github.com/swflint/buffer-layers
