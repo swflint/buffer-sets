@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016 Samuel Flint
 
 ;; Author: Samuel W. Flint <swflint@flintfam.org>
-;; Version: 1.6
+;; Version: 1.7
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: buffer-management
 ;; URL: http://github.com/swflint/buffer-layers
@@ -138,17 +138,19 @@
 (defun buffer-layers-list ()
   "Produce a list of defined buffer layers."
   (interactive)
+  (when (buffer-live-p "*Buffer Layers*")
+    (kill-buffer "*Buffer Layers*"))
   (with-help-window "*Buffer Layers*"
-    (when (buffer-live-p "*Buffer Layers*")
-      (kill-buffer "*Buffer Layers*"))
     (with-current-buffer "*Buffer Layers*"
       (insert "Defined Buffer Layers:\n\n")
-      (insert (with-temp-buffer
-                (dolist (layer *buffer-layers*)
-                  (insert (format " - %s%s\n" layer (if (buffer-layers-applied-p layer) " (Applied)"
-                                                      ""))))
-                (sort-lines nil (buffer-end -1) (buffer-end +1))
-                (buffer-string))))))
+      (dolist (layer *buffer-layers*)
+        (if (not (buffer-layers-applied-p layer))
+            (insert (format " - %s\n" layer))
+          (insert (format " - %s (Applied)\n" layer)))
+        (dolist (buffer (symbol-value (buffer-layers--buffer-list-name layer)))
+          (if (null (get-buffer-window-list buffer nil t))
+              (insert (format "    - %s\n" (buffer-name buffer)))
+            (insert (format "    - %s (visible)\n" (buffer-name buffer)))))))))
 
 (defun buffer-layers-unload-all-buffer-layers ()
   "Unload all loaded buffer layers."
