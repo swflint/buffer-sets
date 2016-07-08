@@ -83,6 +83,10 @@
   "Returns true if LAYER is applied."
   (member layer *buffer-layers-applied*))
 
+(defun buffer-layer--get-buffer-layer-definition (layer-name)
+  (first (cl-remove-if-not (lambda (layer)
+			     (eq layer-name (buffer-layer-name layer))) *buffer-layer-definitions*)))
+
 (cl-defmacro define-buffer-layer (name &key files select on-apply on-remove)
   "Define a buffer layer named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
   `(progn
