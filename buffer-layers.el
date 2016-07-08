@@ -55,6 +55,15 @@
 
 (require 'cl-lib)
 
+(cl-defstruct buffer-layer
+  name
+  files
+  select
+  on-apply
+  on-apply-source
+  on-remove
+  on-remove-source)
+
 (defvar *buffer-layers* nil
   "List of all defined buffer layers.")
 
@@ -86,59 +95,19 @@
   "Generate name to contain buffer layer buffer list based on NAME."
   (intern (format "*buffer-layers-%s-buffers*" name)))
 
-(cl-defmacro define-buffer-layer (name &key files run-on-apply run-on-remove buffer-to-select)
+(cl-defmacro define-buffer-layer (name &key files select on-apply on-remove)
   "Define a buffer layer named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
-  (let ((applier (buffer-layers--applier-name name))
-        (remover (buffer-layers--remover-name name))
-        (buffers-list (buffer-layers--buffer-list-name name))
-        (files-list (cons 'list
-                          (when (not (null files))
-                            (mapcar #'(lambda (name)
-                                        (format "%s" name)) files)))))
-    `(progn
-       (add-to-list '*buffer-layers* ',name)
-       (defvar ,buffers-list nil)
-       (defun ,applier ()
-         ,(format "Apply buffer-layer %s." name)
-         (interactive)
-         (mapcar #'(lambda (file)
-                     (add-to-list ',buffers-list (find-file file)))
-                 ,files-list)
-         ,@run-on-apply
-         (when (not (null ,buffer-to-select))
-           (switch-to-buffer ,buffer-to-select))
-         (add-to-list '*buffer-layers-applied* ',name)
-         (message "Applied Buffer Layer %s" ',name))
-       (defun ,remover ()
-         ,(format "Remove buffer-layer %s." name)
-         (interactive)
-         (mapc #'(lambda (buffer)
-                   (when (buffer-live-p buffer)
-                     (with-current-buffer buffer
-                       (save-buffer)
-                       (kill-buffer))))
-               ,buffers-list)
-         ,@run-on-remove
-         (setq ,buffers-list nil)
-         (setq *buffer-layers-applied* (delq ',name *buffer-layers-applied*))
-         (message "Removed Buffer Layer %s" ',name))
-       (setq current-buffer-applier ',applier)
-       (list ',applier ',remover))))
-
-(cl-defmacro define-buffer-layer-new (name &key files run-on-apply run-on-remove buffer-to-select)
   `(progn
-     (cl-pushnew '(,name
-                   (:files ,@files)
-                   (:on-apply ,@run-on-apply)
-                   (:on-remove ,@run-on-remove)
-                   ,@(when buffer-to-select
-                       (list :select-buffer buffer-to-select))
-                   ,@(when run-on-apply
-                       (list :on-apply-lambda (eval `(lambda () ,@run-on-apply))))
-                   ,@(when run-on-remove
-                       (list :on-remove-lambda (eval `(lambda () ,@run-on-remove)))))
-                 *buffer-layer-definitions* :key #'car)
      (cl-pushnew ',name *buffer-layers*)
+     (cl-pushnew (make-buffer-layer :name ',name
+                                    :files ',files
+                                    :select ,select
+                                    :on-apply-source ',on-apply
+                                    :on-remove-source ',on-remove
+                                    :on-apply (lambda () ,@on-apply)
+                                    :on-remove (lambda () ,@on-remove))
+                 *buffer-layer-definitions*
+                 :key #'buffer-layer-name)
      ',name))
 
 (defun buffer-layers-load-layer (name)
@@ -230,7 +199,18 @@
 
 (defun buffer-layers-save ()
   "Save defined buffer layers."
-  (interactive))
+  (interactive)
+
+  (insert (format "%S\n\n" (let ((name (buffer-layer-name the-layer))
+                                 (files (buffer-layer-files the-layer))
+                                 (select (buffer-layer-select the-layer))
+                                 (on-apply (buffer-layer-on-apply-source the-layer))
+                                 (on-remove (buffer-layer-on-remove-source the-layer)))
+                             `(define-buffer-layer* ,name
+                                :files ,files
+                                :select ,select
+                                :on-apply ,on-apply
+                                :on-remove ,on-remove)))))
 
 (defvar buffer-layers-map (make-keymap)
   "Keymap for buffer-layer commands.")
