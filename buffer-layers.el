@@ -83,18 +83,6 @@
   "Returns true if LAYER is applied."
   (member layer *buffer-layers-applied*))
 
-(defun buffer-layers--applier-name (name)
-  "Generate name to apply a buffer layer based on NAME."
-  (intern (format "apply-buffer-layers-%s" name)))
-
-(defun buffer-layers--remover-name (name)
-  "Generate name to remove a buffer layer based on NAME."
-  (intern (format "remove-buffer-layers-%s" name)))
-
-(defun buffer-layers--buffer-list-name (name)
-  "Generate name to contain buffer layer buffer list based on NAME."
-  (intern (format "*buffer-layers-%s-buffers*" name)))
-
 (cl-defmacro define-buffer-layer (name &key files select on-apply on-remove)
   "Define a buffer layer named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
   `(progn
