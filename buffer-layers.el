@@ -87,6 +87,9 @@
   (first (cl-remove-if-not (lambda (layer)
 			     (eq layer-name (buffer-layer-name layer))) *buffer-layer-definitions*)))
 
+(defun buffer-layer--generate-buffers-list (layer-name)
+  (intern (format "*buffer-layer-%s--buffers*" layer-name)))
+
 (cl-defmacro define-buffer-layer (name &key files select on-apply on-remove)
   "Define a buffer layer named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
   `(progn
@@ -100,16 +103,28 @@
                                     :on-remove (lambda () ,@on-remove))
                  *buffer-layer-definitions*
                  :key #'buffer-layer-name)
+     (defvar ,(buffer-layer--generate-buffers-list name))
      ',name))
 
 (defun buffer-layers-load-layer (name)
-  (interactive (list (completing-read "Layer Name: " *buffer-layers*
-                                      ;; (cl-remove-if #'(lambda (layer) (member layer *buffer-layers-applied*)) *buffer-layers*)
+  (interactive (list (completing-read "Layer Name: "
+                                      (cl-remove-if #'(lambda (layer) (member layer *buffer-layers-applied*)) *buffer-layers*)
                                       nil t)))
   (let ((layer-definition (buffer-layer--get-buffer-layer-definition name)))
-    (if (null layer-definition)
-	(error "Layer Undefined: %s" name)
-      (progn))))
+    ;; (if (not (buffer-layer-p layer-definition))
+    ;; 	(error "Layer Undefined: %s" name))
+    (let ((files (buffer-layer-files layer-definition))
+	  (select (buffer-layer-select layer-definition))
+	  (on-apply (buffer-layer-on-apply layer-definition))
+	  (buffers-list (buffer-layer--generate-buffers-list name)))
+      (mapc (lambda (file)
+	      (add-to-list buffers-list (find-file file)))
+	    files)
+      (funcall on-apply)
+      (when (stringp select)
+	(switch-to-buffer select))
+      (add-to-list '*buffer-layers-applied* name)
+      (message "Applied buffer layer %s." name))))
 
 (defalias 'load-buffer-layer 'buffer-layers-load-layer)
 
@@ -130,7 +145,7 @@
         (if (not (buffer-layers-applied-p layer))
             (insert (format " - %s\n" layer))
           (insert (format " - %s (Applied)\n" layer)))
-        (dolist (buffer (symbol-value (buffer-layers--buffer-list-name layer)))
+        (dolist (buffer (symbol-value (buffer-layers--buffers-list-name layer)))
           (if (null (get-buffer-window-list buffer nil t))
               (insert (format "    - %s\n" (buffer-name buffer)))
             (insert (format "    - %s (visible)\n" (buffer-name buffer)))))))))

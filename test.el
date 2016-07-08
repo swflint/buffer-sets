@@ -47,3 +47,22 @@
   :on-apply ((my/find-current-notes-file)))
 
 *buffer-layer-definitions*
+
+
+(define-buffer-layer org
+  :files ("~/org/"
+          "~/org/agenda.org"
+          "~/org/bookmarks.org"
+          "~/org/college.org"
+          "~/org/index.org"
+          "~/org/personal-log.org"
+          "~/org/quotes.org"
+          "~/org/recipes.org"
+          "~/org/school.org"
+          "~/org/snips.org"
+          "~/org/travel-list.org"
+          "~/org/main.org")
+  :select "main.org"
+  :on-apply ((my/find-current-notes-file)))
+
+(buffer-layer--get-buffer-layer-definition 'org)
