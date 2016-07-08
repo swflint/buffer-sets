@@ -103,35 +103,15 @@
      ',name))
 
 (defun buffer-layers-load-layer (name)
-  (interactive (list (completing-read "Layer Name: " *buffer-layers* ;; (cl-remove-if #'(lambda (layer) (member layer *buffer-layers-applied*)) *buffer-layers*)
+  (interactive (list (completing-read "Layer Name: " *buffer-layers*
+                                      ;; (cl-remove-if #'(lambda (layer) (member layer *buffer-layers-applied*)) *buffer-layers*)
                                       nil t)))
-  (let* ((record (rest (assoc name *buffer-layer-definitions*)))
-         (files (rest (assoc :files record)))
-         (on-apply (rest (assoc :on-apply-lambda record)))
-         (buffer-select (rest (assoc :select-buffer record))))
-    (let ((buffer-list nil))
-      (dolist (file files)
-        (cl-pushnew (find-file file) buffer-list))
-      (add-to-list '*buffer-layer-buffers* `(,name ,@buffer-list)))
-    (when (functionp on-apply)
-      (funcall on-apply))
-    (when buffer-select
-      (switch-to-buffer buffer-select))
-    (message "Applied Buffer Layer %s." name)))
+  (let ((layer-definition (buffer-layer--get-buffer-layer-definition name)))
+    (if (null layer-definition)
+	(error "Layer Undefined: %s" name)
+      (progn))))
 
-(defun buffer-layers-load-buffer-layer (name-or-path load-it-p)
-  "Load a buffer named NAME-OR-PATH, and if a file, apply if LOAD-IT-P is true."
-  (interactive (list (completing-read "Buffer Layer Name or Path: " (cl-remove-if #'(lambda (layer)
-                                                                                      (member layer *buffer-layers-applied*))
-                                                                                  *buffer-layers*))
-                     nil))
-  (if (functionp (buffer-layers--applier-name name-or-path))
-      (funcall (buffer-layers--applier-name name-or-path))
-    (load name-or-path)
-    (when load-it-p
-      (funcall current-buffer-applier))))
-
-(defalias 'load-buffer-layer 'buffer-layers-load-buffer-layer)
+(defalias 'load-buffer-layer 'buffer-layers-load-layer)
 
 (defun buffer-layers-unload-buffer-layer (name)
   "Unload Buffer Layer named NAME."
