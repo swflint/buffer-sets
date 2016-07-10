@@ -145,8 +145,10 @@
 (defun buffer-layers-add-file-to-layer (name file)
   "Add a file to the layer."
   (interactive (list
-                (completing-read "Layer: " *buffer-layers* nil t)
-                (read-file-name "File Name: "))))
+                (intern (completing-read "Layer: " *buffer-layers* nil t))
+                (read-file-name "File Name: ")))
+  (let* ((layer (buffer-layer--get-buffer-layer-definition name)))
+    (setf (buffer-layer-files layer) (append (buffer-layer-files layer) (list file)))))
 
 (defun buffer-layers-add-buffer-to-layer (name buffer)
   "Add a buffer to the given layer."
