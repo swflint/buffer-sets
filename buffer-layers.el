@@ -169,7 +169,11 @@
 
 (defun buffer-layers-set-buffer-to-select (layer)
   "Set the buffer to automatically select."
-  (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
+  (interactive (list (intern (completing-read "Layer: " *buffer-layers* nil t))))
+  (let* ((layer (buffer-layer--get-buffer-layer-definition layer))
+         (files (buffer-layer-files layer)))
+    (setf (buffer-layer-select layer)
+          (completing-read "File: " files nil t))))
 
 (defun buffer-layers-save (the-layer)
   "Save defined buffer layers."
