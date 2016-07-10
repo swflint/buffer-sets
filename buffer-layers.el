@@ -147,14 +147,17 @@
   (interactive (list
                 (intern (completing-read "Layer: " *buffer-layers* nil t))
                 (read-file-name "File Name: ")))
-  (let* ((layer (buffer-layer--get-buffer-layer-definition name)))
+  (let ((layer (buffer-layer--get-buffer-layer-definition name)))
     (setf (buffer-layer-files layer) (append (buffer-layer-files layer) (list file)))))
 
 (defun buffer-layers-add-buffer-to-layer (name buffer)
   "Add a buffer to the given layer."
   (interactive (list
-                (completing-read "Layer: " *buffer-layers* nil t)
-                (read-buffer "Buffer: " (current-buffer)))))
+                (intern (completing-read "Layer: " *buffer-layers* nil t))
+                (get-buffer (read-buffer "Buffer: " (current-buffer)))))
+  (let ((layer (buffer-layer--get-buffer-layer-definition name))
+        (file (buffer-file-name buffer)))
+    (setf (buffer-layer-files layer) (append (buffer-layer-files layer) (list file)))))
 
 (defun buffer-layers-edit-load-actions (layer)
   "Edit the actions to be preformed on buffer layer load."
