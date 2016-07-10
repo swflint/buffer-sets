@@ -68,3 +68,5 @@
 (buffer-layer--get-buffer-layer-definition 'org)
 
 (defun my/find-current-notes-file ())
+
+(buffer-layers-mode)

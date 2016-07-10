@@ -175,16 +175,17 @@
                                 :on-remove ,on-remove)))))
 
 (defun buffer-layers-save-definitions ()
-  (with-current-buffer (find-file *buffer-layers-file*)
-    (mark-whole-buffer)
-    (kill-region)
-    (mapc #'buffer-layers-save *buffer-layer-definitions*))
+  (with-current-buffer (find-file *buffer-layer-file*)
+    (kill-region (buffer-end -1) (buffer-end 1))
+    (mapc #'buffer-layers-save *buffer-layer-definitions*)
+    (save-buffer)
+    (kill-buffer))
   (message "Saved Buffer Layer Definitions."))
 
 (defvar buffer-layers-map (make-keymap)
   "Keymap for buffer-layer commands.")
 
-(define-key buffer-layers-map (kbd "l") #'buffer-layers-load-buffer-layer)
+(define-key buffer-layers-map (kbd "l") #'buffer-layers-load-layer)
 (define-key buffer-layers-map (kbd "L") #'buffer-layers-list)
 (define-key buffer-layers-map (kbd "u") #'buffer-layers-unload-buffer-layer)
 (define-key buffer-layers-map (kbd "U") #'buffer-layers-unload-all-buffer-layers)
@@ -203,11 +204,13 @@
       (progn
         (buffer-layers-load-definitions-file)
         (define-key ctl-x-map (kbd "L") buffer-layers-map)
-        (add-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers))
+        (add-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers)
+        (add-hook 'kill-emacs-hook #'buffer-layers-save-definitions))
     (progn
       (buffer-layers-save-definitions)
       (define-key ctl-x-map (kbd "L") nil)
-      (remove-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers))))
+      (remove-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers)
+      (remove-hook 'kill-emacs-hook #'buffer-layers-save-definitions))))
 
 (provide 'buffer-layers)
 
