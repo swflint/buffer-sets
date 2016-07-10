@@ -70,3 +70,10 @@
 (defun my/find-current-notes-file ())
 
 (buffer-layers-mode)
+
+
+(define-buffer-layer test
+  :files ("~/gits/"
+          "~/recipes/"))
+
+(buffer-layers-save (buffer-layer--get-buffer-layer-definition 'test))
