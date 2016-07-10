@@ -177,7 +177,7 @@
 (defun buffer-layers-save-definitions ()
   (with-current-buffer (find-file *buffer-layer-file*)
     (kill-region (buffer-end -1) (buffer-end 1))
-    (mapc #'buffer-layers-save *buffer-layer-definitions*)
+    (mapc #'buffer-layers-save (reverse *buffer-layer-definitions*))
     (save-buffer)
     (kill-buffer))
   (message "Saved Buffer Layer Definitions."))
