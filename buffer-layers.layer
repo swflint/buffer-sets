@@ -5,4 +5,4 @@
           "/home/swflint/Projects/buffer-layers/buffer-layers.el"
           "/home/swflint/Projects/buffer-layers/README.md"
           "/home/swflint/Projects/buffer-layers/buffer-layers.layer")
-  :buffer-to-select "buffer-layers.el")
+  :select "buffer-layers.el")
