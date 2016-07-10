@@ -168,7 +168,7 @@
                                  (select (buffer-layer-select the-layer))
                                  (on-apply (buffer-layer-on-apply-source the-layer))
                                  (on-remove (buffer-layer-on-remove-source the-layer)))
-                             `(define-buffer-layer* ,name
+                             `(define-buffer-layer ,name
                                 :files ,files
                                 :select ,select
                                 :on-apply ,on-apply
