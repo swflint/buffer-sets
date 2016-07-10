@@ -134,7 +134,13 @@
 
 (defun buffer-layers-create-layer (name)
   "Create a new layer."
-  (interactive "SNew Layer Name: "))
+  (interactive "SNew Layer Name: ")
+  (when (not (member name *buffer-layers*))
+    (pushnew name *buffer-layers*)
+    (setf (symbol-value (buffer-layer--generate-buffers-list name)) nil)
+    (pushnew (make-buffer-layer :name name
+                                :on-apply (lambda () nil)
+                                :on-remove (lambda () nil)) *buffer-layer-definitions*)))
 
 (defun buffer-layers-add-file-to-layer (name file)
   "Add a file to the layer."
