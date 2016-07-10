@@ -39,6 +39,11 @@
 (defvar *buffer-layer-file* "~/.emacs.d/buffer-layer-definitions.el"
   "The file to store buffer layer definitions in.")
 
+(defun buffer-layers-load-definitions-file ()
+  "Load buffer layer definitions file."
+  (load *buffer-layer-file* t t)
+  (message "Loaded Buffer Layer Definitions."))
+
 (defun buffer-layers-applied-p (layer)
   "Returns true if LAYER is applied."
   (member layer *buffer-layers-applied*))
@@ -155,10 +160,9 @@
   "Set the buffer to automatically select."
   (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
 
-(defun buffer-layers-save ()
+(defun buffer-layers-save (the-layer)
   "Save defined buffer layers."
   (interactive)
-
   (insert (format "%S\n\n" (let ((name (buffer-layer-name the-layer))
                                  (files (buffer-layer-files the-layer))
                                  (select (buffer-layer-select the-layer))
@@ -169,6 +173,13 @@
                                 :select ,select
                                 :on-apply ,on-apply
                                 :on-remove ,on-remove)))))
+
+(defun buffer-layers-save-definitions ()
+  (with-current-buffer (find-file *buffer-layers-file*)
+    (mark-whole-buffer)
+    (kill-region)
+    (mapc #'buffer-layers-save *buffer-layer-definitions*))
+  (message "Saved Buffer Layer Definitions."))
 
 (defvar buffer-layers-map (make-keymap)
   "Keymap for buffer-layer commands.")
@@ -190,9 +201,11 @@
   :lighter " BLM" :global t :variable buffer-layers-mode-p
   (if buffer-layers-mode-p
       (progn
+        (buffer-layers-load-definitions-file)
         (define-key ctl-x-map (kbd "L") buffer-layers-map)
         (add-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers))
     (progn
+      (buffer-layers-save-definitions)
       (define-key ctl-x-map (kbd "L") nil)
       (remove-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers))))
 
