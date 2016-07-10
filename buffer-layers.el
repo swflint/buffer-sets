@@ -156,7 +156,7 @@
         (if (not (buffer-layers-applied-p layer))
             (insert (format " - %s\n" layer))
           (insert (format " - %s (Applied)\n" layer)))
-        (dolist (buffer (symbol-value (buffer-layers--buffers-list-name layer)))
+        (dolist (buffer (symbol-value (buffer-layer--generate-buffers-list layer)))
           (if (null (get-buffer-window-list buffer nil t))
               (insert (format "    - %s\n" (buffer-name buffer)))
             (insert (format "    - %s (visible)\n" (buffer-name buffer)))))))))
