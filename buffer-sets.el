@@ -136,11 +136,11 @@
   "Create a new set."
   (interactive "SNew Set Name: ")
   (when (not (member name *buffer-sets*))
-    (pushnew name *buffer-sets*)
+    (cl-pushnew name *buffer-sets*)
     (setf (symbol-value (buffer-set--generate-buffers-list name)) nil)
-    (pushnew (make-buffer-set :name name
-                                :on-apply (lambda () nil)
-                                :on-remove (lambda () nil)) *buffer-set-definitions*)))
+    (cl-pushnew (make-buffer-set :name name
+                                 :on-apply (lambda () nil)
+                                 :on-remove (lambda () nil)) *buffer-set-definitions*)))
 
 (defun buffer-sets-add-file-to-set (name file)
   "Add a file to the set."
