@@ -154,7 +154,7 @@
   (interactive (list
                 (intern (completing-read "Set: " *buffer-sets* nil t))
                 (read-directory-name "Directory: ")))
-  (let ((set (buffer-set--get-buffer-set-definition-name)))
+  (let ((set (buffer-set--get-buffer-set-definition name)))
     (setf (buffer-set-files set) (append (buffer-set-files set) (list directory)))))
 
 (defun buffer-sets-add-buffer-to-set (name buffer)
