@@ -1,8 +1,0 @@
-;; -*- emacs-lisp -*-
-
-(define-buffer-layer buffer-layers
-  :files ("/home/swflint/Projects/buffer-layers"
-          "/home/swflint/Projects/buffer-layers/buffer-layers.el"
-          "/home/swflint/Projects/buffer-layers/README.md"
-          "/home/swflint/Projects/buffer-layers/buffer-layers.layer")
-  :select "buffer-layers.el")
