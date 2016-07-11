@@ -6,7 +6,7 @@
 ;; Version: 2.0
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: buffer-management
-;; URL: http://github.com/swflint/buffer-layers
+;; URL: http://github.com/swflint/buffer-sets
 
 ;;; Commentary:
 ;;
