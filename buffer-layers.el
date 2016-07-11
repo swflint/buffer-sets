@@ -150,6 +150,13 @@
   (let ((layer (buffer-layer--get-buffer-layer-definition name)))
     (setf (buffer-layer-files layer) (append (buffer-layer-files layer) (list file)))))
 
+(defun buffer-layers-add-directory-to-layer (name directory)
+  (interactive (list
+                (intern (completing-read "Layer: " *buffer-layers* nil t))
+                (read-directory-name "Directory: ")))
+  (let ((layer (buffer-layer--get-buffer-layer-definition-name)))
+    (setf (buffer-layer-files layer) (append (buffer-layer-files layer) (list directory)))))
+
 (defun buffer-layers-add-buffer-to-layer (name buffer)
   "Add a buffer to the given layer."
   (interactive (list
@@ -207,6 +214,7 @@
 (define-key buffer-layers-map (kbd "c") #'buffer-layers-create-layer)
 (define-key buffer-layers-map (kbd "f") #'buffer-layers-add-file-to-layer)
 (define-key buffer-layers-map (kbd "b") #'buffer-layers-add-buffer-to-layer)
+(define-key buffer-layers-map (kbd "d") #'buffer-layers-add-directory-to-layer)
 (define-key buffer-layers-map (kbd "a") #'buffer-layers-edit-load-actions)
 (define-key buffer-layers-map (kbd "r") #'buffer-layers-edit-remove-actions)
 (define-key buffer-layers-map (kbd "s") #'buffer-layers-set-buffer-to-select)
