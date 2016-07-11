@@ -166,13 +166,13 @@
         (file (buffer-file-name buffer)))
     (setf (buffer-layer-files layer) (append (buffer-layer-files layer) (list file)))))
 
-(defun buffer-layers-edit-load-actions (layer)
-  "Edit the actions to be preformed on buffer layer load."
-  (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
+;; (defun buffer-layers-edit-load-actions (layer)
+;;   "Edit the actions to be preformed on buffer layer load."
+;;   (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
 
-(defun buffer-layers-edit-remove-actions (layer)
-  "Edit the actions to be preformed on buffer layer removal."
-  (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
+;; (defun buffer-layers-edit-remove-actions (layer)
+;;   "Edit the actions to be preformed on buffer layer removal."
+;;   (interactive (list (completing-read "Layer: " *buffer-layers* nil t))))
 
 (defun buffer-layers-set-buffer-to-select (layer)
   "Set the buffer to automatically select."
@@ -215,8 +215,8 @@
 (define-key buffer-layers-map (kbd "f") #'buffer-layers-add-file-to-layer)
 (define-key buffer-layers-map (kbd "b") #'buffer-layers-add-buffer-to-layer)
 (define-key buffer-layers-map (kbd "d") #'buffer-layers-add-directory-to-layer)
-(define-key buffer-layers-map (kbd "a") #'buffer-layers-edit-load-actions)
-(define-key buffer-layers-map (kbd "r") #'buffer-layers-edit-remove-actions)
+;; (define-key buffer-layers-map (kbd "a") #'buffer-layers-edit-load-actions)
+;; (define-key buffer-layers-map (kbd "r") #'buffer-layers-edit-remove-actions)
 (define-key buffer-layers-map (kbd "s") #'buffer-layers-set-buffer-to-select)
 (define-key buffer-layers-map (kbd "C-s") #'buffer-layers-save)
 
