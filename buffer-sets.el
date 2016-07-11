@@ -235,6 +235,6 @@
       (remove-hook 'kill-emacs-hook #'buffer-layers-unload-all-buffer-layers)
       (remove-hook 'kill-emacs-hook #'buffer-layers-save-definitions))))
 
-(provide 'buffer-layers)
+(provide 'buffer-sets)
 
 ;;; buffer-layers.el ends here
