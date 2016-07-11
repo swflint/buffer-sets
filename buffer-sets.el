@@ -1,9 +1,9 @@
-;;; buffer-layers.el --- Layered Buffers for Buffer Management
+;;; buffer-sets.el --- Sets of Buffers for Buffer Management
 
 ;; Copyright (C) 2016 Samuel Flint
 
 ;; Author: Samuel W. Flint <swflint@flintfam.org>
-;; Version: 1.8
+;; Version: 2.0
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: buffer-management
 ;; URL: http://github.com/swflint/buffer-layers
