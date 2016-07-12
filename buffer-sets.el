@@ -114,7 +114,7 @@
 ;;;###autoload
 (defun buffer-sets-unload-buffer-set (name)
   "Unload Buffer Set named NAME."
-  (interactive (list (intern (completing-read "Buffer Set Name: " *buffer-sets-applied*))))
+  (interactive (list (intern (completing-read "Set Name: " *buffer-sets-applied*))))
   (let ((set-definition (buffer-set--get-buffer-set-definition name)))
     (if (not (buffer-set-p set-definition))
         (error "Set Undefined: %s" name)
@@ -172,7 +172,7 @@
 (defun buffer-sets-add-file-to-set (name file)
   "Add a file to the set."
   (interactive (list
-                (intern (completing-read "Set: " *buffer-sets* nil t))
+                (intern (completing-read "Set Name: " *buffer-sets* nil t))
                 (read-file-name "File Name: ")))
   (let ((set (buffer-set--get-buffer-set-definition name)))
     (setf (buffer-set-files set) (append (buffer-set-files set) (list file)))))
@@ -180,7 +180,7 @@
 ;;;###autoload
 (defun buffer-sets-add-directory-to-set (name directory)
   (interactive (list
-                (intern (completing-read "Set: " *buffer-sets* nil t))
+                (intern (completing-read "Set Name: " *buffer-sets* nil t))
                 (read-directory-name "Directory: ")))
   (let ((set (buffer-set--get-buffer-set-definition name)))
     (setf (buffer-set-files set) (append (buffer-set-files set) (list directory)))))
@@ -189,7 +189,7 @@
 (defun buffer-sets-add-buffer-to-set (name buffer)
   "Add a buffer to the given set."
   (interactive (list
-                (intern (completing-read "Set: " *buffer-sets* nil t))
+                (intern (completing-read "Set Name: " *buffer-sets* nil t))
                 (get-buffer (read-buffer "Buffer: " (current-buffer)))))
   (let ((set (buffer-set--get-buffer-set-definition name))
         (file (buffer-file-name buffer)))
@@ -206,7 +206,7 @@
 ;;;###autoload
 (defun buffer-sets-set-buffer-to-select (set)
   "Set the buffer to automatically select."
-  (interactive (list (intern (completing-read "Set: " *buffer-sets* nil t))))
+  (interactive (list (intern (completing-read "Set Name: " *buffer-sets* nil t))))
   (let* ((set (buffer-set--get-buffer-set-definition set))
          (files (buffer-set-files set)))
     (setf (buffer-set-select set)
@@ -214,7 +214,7 @@
 
 ;;;###autoload
 (defun buffer-sets-remove-file (set)
-  (interactive (list (intern (completing-read "Set: " *buffer-sets* nil t))))
+  (interactive (list (intern (completing-read "Set Name: " *buffer-sets* nil t))))
   (let ((set (buffer-set--get-buffer-set-definition set)))
     (setf (buffer-set-files set)
           (delq (completing-read "File: " (buffer-set-files set) nil t)
