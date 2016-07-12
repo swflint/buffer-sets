@@ -182,6 +182,13 @@
     (setf (buffer-set-select set)
           (completing-read "File: " files nil t))))
 
+(defun buffer-sets-remove-file (set)
+  (interactive (list (intern (completing-read "Set: " *buffer-sets* nil t))))
+  (let ((set (buffer-set--get-buffer-set-definition set)))
+    (setf (buffer-set-files set)
+          (delq (completing-read "File: " (buffer-set-files set) nil t)
+                (buffer-set-files set)))))
+
 (defun buffer-sets-save (the-set)
   "Save defined buffer sets."
   (interactive)
@@ -215,10 +222,10 @@
 (define-key buffer-sets-map (kbd "f") #'buffer-sets-add-file-to-set)
 (define-key buffer-sets-map (kbd "b") #'buffer-sets-add-buffer-to-set)
 (define-key buffer-sets-map (kbd "d") #'buffer-sets-add-directory-to-set)
+(define-key buffer-sets-map (kbd "R") #'buffer-sets-remove-file)
+(define-key buffer-sets-map (kbd "s") #'buffer-sets-set-buffer-to-select)
 ;; (define-key buffer-sets-map (kbd "a") #'buffer-sets-edit-load-actions)
 ;; (define-key buffer-sets-map (kbd "r") #'buffer-sets-edit-remove-actions)
-(define-key buffer-sets-map (kbd "s") #'buffer-sets-set-buffer-to-select)
-(define-key buffer-sets-map (kbd "C-s") #'buffer-sets-save)
 
 (define-minor-mode buffer-sets-mode
   "A mode for managing sets of buffers."
