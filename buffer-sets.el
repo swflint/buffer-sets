@@ -271,21 +271,6 @@
     keymap)
   "Keymap for buffer-set commands.")
 
-;; (define-key buffer-sets-map (kbd "l") #'buffer-sets-load-set)
-;; (define-key buffer-sets-map (kbd "L") #'buffer-sets-list)
-;; (define-key buffer-sets-map (kbd "u") #'buffer-sets-unload-buffer-set)
-;; (define-key buffer-sets-map (kbd "U") #'buffer-sets-unload-all-buffer-sets)
-;; (define-key buffer-sets-map (kbd "c") #'buffer-sets-create-set)
-;; (define-key buffer-sets-map (kbd "f") #'buffer-sets-add-file-to-set)
-;; (define-key buffer-sets-map (kbd "b") #'buffer-sets-add-buffer-to-set)
-;; (define-key buffer-sets-map (kbd "d") #'buffer-sets-add-directory-to-set)
-;; (define-key buffer-sets-map (kbd "R") #'buffer-sets-remove-file)
-;; (define-key buffer-sets-map (kbd "s") #'buffer-sets-set-buffer-to-select)
-;; (define-key buffer-sets-map (kbd "C-f") #'buffer-sets-load-definitions-file)
-;; (define-key buffer-sets-map (kbd "C-s") #'buffer-sets-save-definitions)
-;; (define-key buffer-sets-map (kbd "a") #'buffer-sets-edit-load-actions)
-;; (define-key buffer-sets-map (kbd "r") #'buffer-sets-edit-remove-actions)
-
 ;;;###autoload
 (define-minor-mode buffer-sets-mode
   "A mode for managing sets of buffers."
