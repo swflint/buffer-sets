@@ -40,6 +40,8 @@
 (defvar *buffer-set-buffers* nil
   "List of buffers in loaded buffer sets.")
 
+(defvar buffer-sets-mode-p nil)
+
 (defcustom buffer-set-file "~/.emacs.d/buffer-set-definitions.el"
   "The file to store buffer set definitions in."
   :type 'file :group 'editing)
