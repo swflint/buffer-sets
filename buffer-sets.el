@@ -36,12 +36,12 @@
 (defvar *buffer-set-buffers* nil
   "List of buffers in loaded buffer sets.")
 
-(defvar *buffer-set-file* "~/.emacs.d/buffer-set-definitions.el"
+(defvar buffer-set-file "~/.emacs.d/buffer-set-definitions.el"
   "The file to store buffer set definitions in.")
 
 (defun buffer-sets-load-definitions-file ()
   "Load buffer set definitions file."
-  (load *buffer-set-file* t t)
+  (load buffer-set-file t t)
   (message "Loaded Buffer Set Definitions."))
 
 (defun buffer-sets-applied-p (set)
@@ -205,7 +205,7 @@
                                 :on-remove ,on-remove)))))
 
 (defun buffer-sets-save-definitions ()
-  (with-current-buffer (find-file *buffer-set-file*)
+  (with-current-buffer (find-file buffer-set-file)
     (kill-region (buffer-end -1) (buffer-end 1))
     (mapc #'buffer-sets-save (reverse *buffer-set-definitions*))
     (save-buffer)
