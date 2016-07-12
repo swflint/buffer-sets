@@ -204,13 +204,13 @@
 ;;   (interactive (list (completing-read "Set: " *buffer-sets* nil t))))
 
 ;;;###autoload
-(defun buffer-sets-set-buffer-to-select (set)
+(defun buffer-sets-set-buffer-to-select (name)
   "Set the buffer to automatically select."
   (interactive (list (intern (completing-read "Set Name: " *buffer-sets* nil t))))
-  (let* ((set (buffer-set--get-buffer-set-definition set))
+  (let* ((set (buffer-set--get-buffer-set-definition name))
          (files (buffer-set-files set)))
     (setf (buffer-set-select set)
-          (completing-read "File: " files nil t))))
+          (completing-read "Buffer: " (mapcar #'buffer-name (symbol-value (buffer-set--generate-buffers-list name))) nil t))))
 
 ;;;###autoload
 (defun buffer-sets-remove-file (set)
