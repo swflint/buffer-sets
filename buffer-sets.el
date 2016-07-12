@@ -42,6 +42,12 @@
 
 (defvar buffer-sets-mode-p nil)
 
+(defvar buffer-sets-load-set-hook '()
+  "Hook run on set load.")
+
+(defvar buffer-sets-unload-hook '()
+  "Hook run on set unload.")
+
 (defcustom buffer-set-file "~/.emacs.d/buffer-set-definitions.el"
   "The file to store buffer set definitions in."
   :type 'file :group 'editing)
@@ -100,6 +106,7 @@
         (when (stringp select)
           (switch-to-buffer select))
         (add-to-list '*buffer-sets-applied* name)
+        (run-hook buffer-sets-load-set-hook)
         (message "Applied buffer set %s." name)))))
 
 (defalias 'load-buffer-set 'buffer-sets-load-set)
@@ -122,6 +129,7 @@
         (funcall on-remove)
         (setf (symbol-value buffers-list) nil)
         (setq *buffer-sets-applied* (delq name *buffer-sets-applied*))
+        (run-hooks buffer-sets-unload-hook)
         (message "Removed Buffer Set: %s" name)))))
 
 ;;;###autoload
