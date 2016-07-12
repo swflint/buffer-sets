@@ -36,8 +36,9 @@
 (defvar *buffer-set-buffers* nil
   "List of buffers in loaded buffer sets.")
 
-(defvar buffer-set-file "~/.emacs.d/buffer-set-definitions.el"
-  "The file to store buffer set definitions in.")
+(defcustom buffer-set-file "~/.emacs.d/buffer-set-definitions.el"
+  "The file to store buffer set definitions in."
+  :type 'file :group 'editing)
 
 (defun buffer-sets-load-definitions-file ()
   "Load buffer set definitions file."
