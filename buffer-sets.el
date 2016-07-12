@@ -40,8 +40,10 @@
   "The file to store buffer set definitions in."
   :type 'file :group 'editing)
 
+;;;###autoload
 (defun buffer-sets-load-definitions-file ()
   "Load buffer set definitions file."
+  (interactive)
   (load buffer-set-file t t)
   (message "Loaded Buffer Set Definitions."))
 
@@ -61,17 +63,18 @@
   `(progn
      (cl-pushnew ',name *buffer-sets*)
      (cl-pushnew (make-buffer-set :name ',name
-                                    :files ',files
-                                    :select ,select
-                                    :on-apply-source ',on-apply
-                                    :on-remove-source ',on-remove
-                                    :on-apply (lambda () ,@on-apply)
-                                    :on-remove (lambda () ,@on-remove))
+                                  :files ',files
+                                  :select ,select
+                                  :on-apply-source ',on-apply
+                                  :on-remove-source ',on-remove
+                                  :on-apply (lambda () ,@on-apply)
+                                  :on-remove (lambda () ,@on-remove))
                  *buffer-set-definitions*
                  :key #'buffer-set-name)
      (defvar ,(buffer-set--generate-buffers-list name) nil)
      ',name))
 
+;;;###autoload
 (defun buffer-sets-load-set (name)
   (interactive (list (intern (completing-read "Set Name: "
                                               (cl-remove-if #'(lambda (set) (member set *buffer-sets-applied*)) *buffer-sets*)
@@ -92,6 +95,7 @@
 
 (defalias 'load-buffer-set 'buffer-sets-load-set)
 
+;;;###autoload
 (defun buffer-sets-unload-buffer-set (name)
   "Unload Buffer Set named NAME."
   (interactive (list (intern (completing-read "Buffer Set Name: " *buffer-sets-applied*))))
@@ -111,6 +115,7 @@
         (setq *buffer-sets-applied* (delq name *buffer-sets-applied*))
         (message "Removed Buffer Set: %s" name)))))
 
+;;;###autoload
 (defun buffer-sets-list ()
   "Produce a list of defined buffer sets."
   (interactive)
@@ -128,12 +133,14 @@
               (insert (format "    - %s\n" (buffer-name buffer)))
             (insert (format "    - %s (visible)\n" (buffer-name buffer)))))))))
 
+;;;###autoload
 (defun buffer-sets-unload-all-buffer-sets ()
   "Unload all loaded buffer sets."
   (interactive)
   (dolist (buffer-set *buffer-sets-applied*)
     (buffer-sets-unload-buffer-set buffer-set)))
 
+;;;###autoload
 (defun buffer-sets-create-set (name)
   "Create a new set."
   (interactive "SNew Set Name: ")
@@ -144,6 +151,7 @@
                                  :on-apply (lambda () nil)
                                  :on-remove (lambda () nil)) *buffer-set-definitions*)))
 
+;;;###autoload
 (defun buffer-sets-add-file-to-set (name file)
   "Add a file to the set."
   (interactive (list
@@ -152,6 +160,7 @@
   (let ((set (buffer-set--get-buffer-set-definition name)))
     (setf (buffer-set-files set) (append (buffer-set-files set) (list file)))))
 
+;;;###autoload
 (defun buffer-sets-add-directory-to-set (name directory)
   (interactive (list
                 (intern (completing-read "Set: " *buffer-sets* nil t))
@@ -159,6 +168,7 @@
   (let ((set (buffer-set--get-buffer-set-definition name)))
     (setf (buffer-set-files set) (append (buffer-set-files set) (list directory)))))
 
+;;;###autoload
 (defun buffer-sets-add-buffer-to-set (name buffer)
   "Add a buffer to the given set."
   (interactive (list
@@ -176,6 +186,7 @@
 ;;   "Edit the actions to be preformed on buffer set removal."
 ;;   (interactive (list (completing-read "Set: " *buffer-sets* nil t))))
 
+;;;###autoload
 (defun buffer-sets-set-buffer-to-select (set)
   "Set the buffer to automatically select."
   (interactive (list (intern (completing-read "Set: " *buffer-sets* nil t))))
@@ -184,6 +195,7 @@
     (setf (buffer-set-select set)
           (completing-read "File: " files nil t))))
 
+;;;###autoload
 (defun buffer-sets-remove-file (set)
   (interactive (list (intern (completing-read "Set: " *buffer-sets* nil t))))
   (let ((set (buffer-set--get-buffer-set-definition set)))
@@ -193,7 +205,6 @@
 
 (defun buffer-sets-save (the-set)
   "Save defined buffer sets."
-  (interactive)
   (insert (format "%S\n\n" (let ((name (buffer-set-name the-set))
                                  (files (buffer-set-files the-set))
                                  (select (buffer-set-select the-set))
@@ -205,7 +216,9 @@
                                 :on-apply ,on-apply
                                 :on-remove ,on-remove)))))
 
+;;;###autoload
 (defun buffer-sets-save-definitions ()
+  (interactive)
   (with-current-buffer (find-file buffer-set-file)
     (kill-region (buffer-end -1) (buffer-end 1))
     (mapc #'buffer-sets-save (reverse *buffer-set-definitions*))
@@ -226,9 +239,12 @@
 (define-key buffer-sets-map (kbd "d") #'buffer-sets-add-directory-to-set)
 (define-key buffer-sets-map (kbd "R") #'buffer-sets-remove-file)
 (define-key buffer-sets-map (kbd "s") #'buffer-sets-set-buffer-to-select)
+(define-key buffer-sets-map (kbd "C-f") #'buffer-sets-load-definitions-file)
+(define-key buffer-sets-map (kbd "C-s") #'buffer-sets-save-definitions)
 ;; (define-key buffer-sets-map (kbd "a") #'buffer-sets-edit-load-actions)
 ;; (define-key buffer-sets-map (kbd "r") #'buffer-sets-edit-remove-actions)
 
+;;;###autoload
 (define-minor-mode buffer-sets-mode
   "A mode for managing sets of buffers."
   :lighter " BSM" :global t :variable buffer-sets-mode-p
