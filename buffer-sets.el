@@ -106,7 +106,7 @@
         (when (stringp select)
           (switch-to-buffer select))
         (add-to-list '*buffer-sets-applied* name)
-        (run-hook buffer-sets-load-set-hook)
+        (run-hooks 'buffer-sets-load-set-hook)
         (message "Applied buffer set %s." name)))))
 
 (defalias 'load-buffer-set 'buffer-sets-load-set)
@@ -129,7 +129,7 @@
         (funcall on-remove)
         (setf (symbol-value buffers-list) nil)
         (setq *buffer-sets-applied* (delq name *buffer-sets-applied*))
-        (run-hooks buffer-sets-unload-hook)
+        (run-hooks 'buffer-sets-unload-hook)
         (message "Removed Buffer Set: %s" name)))))
 
 ;;;###autoload
