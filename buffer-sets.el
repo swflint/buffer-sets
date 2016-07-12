@@ -100,9 +100,10 @@
       (let ((buffers-list (buffer-set--generate-buffers-list name))
             (on-remove (buffer-set-on-remove set-definition)))
         (mapc (lambda (buffer)
-                (with-current-buffer buffer
-                  (save-buffer)
-                  (kill-buffer buffer)))
+                (when (buffer-live-p buffer)
+                  (with-current-buffer buffer
+                    (save-buffer)
+                    (kill-buffer buffer))))
               (symbol-value buffers-list))
         (funcall on-remove)
         (setf (symbol-value buffers-list) nil)
