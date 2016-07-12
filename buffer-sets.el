@@ -11,9 +11,13 @@
 ;;; Commentary:
 ;;
 
+
+
 ;;; Code:
 
 (require 'cl-lib)
+
+;;; Variables and Structures
 
 (cl-defstruct buffer-set
   name
@@ -40,12 +44,8 @@
   "The file to store buffer set definitions in."
   :type 'file :group 'editing)
 
-;;;###autoload
-(defun buffer-sets-load-definitions-file ()
-  "Load buffer set definitions file."
-  (interactive)
-  (load buffer-set-file t t)
-  (message "Loaded Buffer Set Definitions."))
+
+;;; Utility Functions
 
 (defun buffer-sets-applied-p (set)
   "Returns true if SET is applied."
@@ -57,6 +57,9 @@
 
 (defun buffer-set--generate-buffers-list (set-name)
   (intern (format "*buffer-set-%s--buffers*" set-name)))
+
+
+;;; Set Definition
 
 ;;;###autoload
 (cl-defmacro define-buffer-set (name &key files select on-apply on-remove)
@@ -74,6 +77,9 @@
                  :key #'buffer-set-name)
      (defvar ,(buffer-set--generate-buffers-list name) nil)
      ',name))
+
+
+;;; Interactive Functions
 
 ;;;###autoload
 (defun buffer-sets-load-set (name)
@@ -204,6 +210,9 @@
           (delq (completing-read "File: " (buffer-set-files set) nil t)
                 (buffer-set-files set)))))
 
+
+;;; File Functions
+
 (defun buffer-sets-save (the-set)
   "Save defined buffer sets."
   (insert (format "%S\n\n" (let ((name (buffer-set-name the-set))
@@ -218,6 +227,13 @@
                                 :on-remove ,on-remove)))))
 
 ;;;###autoload
+(defun buffer-sets-load-definitions-file ()
+  "Load buffer set definitions file."
+  (interactive)
+  (load buffer-set-file t t)
+  (message "Loaded Buffer Set Definitions."))
+
+;;;###autoload
 (defun buffer-sets-save-definitions ()
   (interactive)
   (with-current-buffer (find-file buffer-set-file)
@@ -227,21 +243,44 @@
     (kill-buffer))
   (message "Saved Buffer Set Definitions."))
 
-(defvar buffer-sets-map (make-keymap)
+
+;;; Mode Definition
+
+(defvar buffer-sets-map
+  (let ((keymap (make-keymap)))
+    (mapc (lambda (pair)
+            (cl-destructuring-bind (key . command) pair
+              (define-key keymap (kbd key) command)))
+          '(("l" . #'buffer-sets-load-set)
+            ("L" . #'buffer-sets-list)
+            ("u" . #'buffer-sets-unload-buffer-set)
+            ("U" . #'buffer-sets-unload-all-buffer-sets)
+            ("c" . #'buffer-sets-create-set)
+            ("f" . #'buffer-sets-add-file-to-set)
+            ("b" . #'buffer-sets-add-buffer-to-set)
+            ("d" . #'buffer-sets-add-directory-to-set)
+            ("R" . #'buffer-sets-remove-file)
+            ("s" . #'buffer-sets-set-buffer-to-select)
+            ("C-f" . #'buffer-sets-load-definitions-file)
+            ("C-s" . #'buffer-sets-save-definitions)
+            ;; ("a" . #'buffer-sets-edit-load-actions)
+            ;; ("r" . #'buffer-sets-edit-remove-actions)
+            ))
+    keymap)
   "Keymap for buffer-set commands.")
 
-(define-key buffer-sets-map (kbd "l") #'buffer-sets-load-set)
-(define-key buffer-sets-map (kbd "L") #'buffer-sets-list)
-(define-key buffer-sets-map (kbd "u") #'buffer-sets-unload-buffer-set)
-(define-key buffer-sets-map (kbd "U") #'buffer-sets-unload-all-buffer-sets)
-(define-key buffer-sets-map (kbd "c") #'buffer-sets-create-set)
-(define-key buffer-sets-map (kbd "f") #'buffer-sets-add-file-to-set)
-(define-key buffer-sets-map (kbd "b") #'buffer-sets-add-buffer-to-set)
-(define-key buffer-sets-map (kbd "d") #'buffer-sets-add-directory-to-set)
-(define-key buffer-sets-map (kbd "R") #'buffer-sets-remove-file)
-(define-key buffer-sets-map (kbd "s") #'buffer-sets-set-buffer-to-select)
-(define-key buffer-sets-map (kbd "C-f") #'buffer-sets-load-definitions-file)
-(define-key buffer-sets-map (kbd "C-s") #'buffer-sets-save-definitions)
+;; (define-key buffer-sets-map (kbd "l") #'buffer-sets-load-set)
+;; (define-key buffer-sets-map (kbd "L") #'buffer-sets-list)
+;; (define-key buffer-sets-map (kbd "u") #'buffer-sets-unload-buffer-set)
+;; (define-key buffer-sets-map (kbd "U") #'buffer-sets-unload-all-buffer-sets)
+;; (define-key buffer-sets-map (kbd "c") #'buffer-sets-create-set)
+;; (define-key buffer-sets-map (kbd "f") #'buffer-sets-add-file-to-set)
+;; (define-key buffer-sets-map (kbd "b") #'buffer-sets-add-buffer-to-set)
+;; (define-key buffer-sets-map (kbd "d") #'buffer-sets-add-directory-to-set)
+;; (define-key buffer-sets-map (kbd "R") #'buffer-sets-remove-file)
+;; (define-key buffer-sets-map (kbd "s") #'buffer-sets-set-buffer-to-select)
+;; (define-key buffer-sets-map (kbd "C-f") #'buffer-sets-load-definitions-file)
+;; (define-key buffer-sets-map (kbd "C-s") #'buffer-sets-save-definitions)
 ;; (define-key buffer-sets-map (kbd "a") #'buffer-sets-edit-load-actions)
 ;; (define-key buffer-sets-map (kbd "r") #'buffer-sets-edit-remove-actions)
 
