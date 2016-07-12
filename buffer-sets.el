@@ -58,6 +58,7 @@
 (defun buffer-set--generate-buffers-list (set-name)
   (intern (format "*buffer-set-%s--buffers*" set-name)))
 
+;;;###autoload
 (cl-defmacro define-buffer-set (name &key files select on-apply on-remove)
   "Define a buffer set named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
   `(progn
