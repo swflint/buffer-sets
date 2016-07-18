@@ -133,6 +133,12 @@
         (message "Removed Buffer Set: %s" name)))))
 
 ;;;###autoload
+(defun buffer-sets-unload-last-loaded-set ()
+  (interactive)
+  (let ((set (first *buffer-sets-applied*)))
+    (buffer-sets-unload-buffer-set set)))
+
+;;;###autoload
 (defun buffer-sets-list ()
   "Produce a list of defined buffer sets."
   (interactive)
@@ -271,6 +277,7 @@
             ("d" . buffer-sets-add-directory-to-set)
             ("R" . buffer-sets-remove-file)
             ("s" . buffer-sets-set-buffer-to-select)
+            ("p" . buffer-sets-unload-last-loaded-set)
             ("C-f" . buffer-sets-load-definitions-file)
             ("C-s" . buffer-sets-save-definitions)
             ;; ("a" . buffer-sets-edit-load-actions)
