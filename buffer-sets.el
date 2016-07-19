@@ -112,7 +112,7 @@
 (defalias 'load-buffer-set 'buffer-sets-load-set)
 
 (defun buffer-sets-in-buffers-list (set buffer)
-  (add-to-list (symbol-value (buffer-set--generate-buffers-list set)) buffer))
+  (cl-pushnew buffer (symbol-value (buffer-set--generate-buffers-list set))))
 
 ;;;###autoload
 (defun buffer-sets-unload-buffer-set (name)
