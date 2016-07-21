@@ -155,9 +155,11 @@
             (insert (format " - %s\n" set))
           (insert (format " - %s (Applied)\n" set)))
         (dolist (buffer (symbol-value (buffer-set--generate-buffers-list set)))
-          (if (null (get-buffer-window-list buffer nil t))
-              (insert (format "    - %s\n" (buffer-name buffer)))
-            (insert (format "    - %s (visible)\n" (buffer-name buffer)))))))))
+          (if (buffer-live-p buffer)
+              (if (null (get-buffer-window-list buffer nil t))
+                  (insert (format "    - %s\n" (buffer-name buffer)))
+                (insert (format "    - %s (visible)\n" (buffer-name buffer))))
+            ""))))))
 
 ;;;###autoload
 (defun buffer-sets-unload-all-buffer-sets ()
