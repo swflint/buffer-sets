@@ -138,7 +138,7 @@
 ;;;###autoload
 (defun buffer-sets-unload-last-loaded-set ()
   (interactive)
-  (let ((set (first *buffer-sets-applied*)))
+  (let ((set (cl-first *buffer-sets-applied*)))
     (buffer-sets-unload-buffer-set set)))
 
 ;;;###autoload
