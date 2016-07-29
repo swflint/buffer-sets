@@ -74,15 +74,16 @@
   "Define a buffer set named NAME, taking FILES, RUN-ON-APPLY, RUN-ON-REMOVE and BUFFER-TO-SELECT as keyword arguments."
   `(progn
      (cl-pushnew ',name *buffer-sets*)
-     (cl-pushnew (make-buffer-set :name ',name
-                                  :files ',files
-                                  :select ,select
-                                  :on-apply-source ',on-apply
-                                  :on-remove-source ',on-remove
-                                  :on-apply (lambda () ,@on-apply)
-                                  :on-remove (lambda () ,@on-remove))
-                 *buffer-set-definitions*
-                 :key #'buffer-set-name)
+     (setq *buffer-set-definitions* (cons (make-buffer-set :name ',name
+                                                           :files ',files
+                                                           :select ,select
+                                                           :on-apply-source ',on-apply
+                                                           :on-remove-source ',on-remove
+                                                           :on-apply (lambda () ,@on-apply)
+                                                           :on-remove (lambda () ,@on-remove))
+                                          (cl-remove-if (lambda (structure)
+                                                          (eq ',name (buffer-set-name structure)))
+                                                        *buffer-set-definitions*)))
      (defvar ,(buffer-set--generate-buffers-list name) nil)
      ',name))
 
