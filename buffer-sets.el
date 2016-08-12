@@ -3,7 +3,7 @@
 ;; Copyright (C) 2016 Samuel Flint
 
 ;; Author: Samuel W. Flint <swflint@flintfam.org>
-;; Version: 2.0
+;; Version: 2.5
 ;; Package-Requires: ((cl-lib "0.5"))
 ;; Keywords: buffer-management
 ;; URL: http://github.com/swflint/buffer-sets
@@ -268,43 +268,35 @@
 
 ;;; Mode Definition
 
-(defvar buffer-sets-map
+(defvar buffer-sets-mode-map
   (let ((keymap (make-keymap)))
-    (mapc (lambda (pair)
-            (cl-destructuring-bind (key . command) pair
-              (define-key keymap (kbd key) command)))
-          '(("l" . buffer-sets-load-set)
-            ("L" . buffer-sets-list)
-            ("u" . buffer-sets-unload-buffer-set)
-            ("U" . buffer-sets-unload-all-buffer-sets)
-            ("c" . buffer-sets-create-set)
-            ("f" . buffer-sets-add-file-to-set)
-            ("b" . buffer-sets-add-buffer-to-set)
-            ("d" . buffer-sets-add-directory-to-set)
-            ("R" . buffer-sets-remove-file)
-            ("s" . buffer-sets-set-buffer-to-select)
-            ("p" . buffer-sets-unload-last-loaded-set)
-            ("C-f" . buffer-sets-load-definitions-file)
-            ("C-s" . buffer-sets-save-definitions)
-            ;; ("a" . buffer-sets-edit-load-actions)
-            ;; ("r" . buffer-sets-edit-remove-actions)
-            ))
+    (define-key keymap (kbd "C-x L l") #'buffer-sets-load-set)
+    (define-key keymap (kbd "C-x L L") #'buffer-sets-list)
+    (define-key keymap (kbd "C-x L u") #'buffer-sets-unload-buffer-set)
+    (define-key keymap (kbd "C-x L U") #'buffer-sets-unload-all-buffer-sets)
+    (define-key keymap (kbd "C-x L c") #'buffer-sets-create-set)
+    (define-key keymap (kbd "C-x L f") #'buffer-sets-add-file-to-set)
+    (define-key keymap (kbd "C-x L b") #'buffer-sets-add-buffer-to-set)
+    (define-key keymap (kbd "C-x L d") #'buffer-sets-add-directory-to-set)
+    (define-key keymap (kbd "C-x L R") #'buffer-sets-remove-file)
+    (define-key keymap (kbd "C-x L s") #'buffer-sets-set-buffer-to-select)
+    (define-key keymap (kbd "C-x L p") #'buffer-sets-unload-last-loaded-set)
+    (define-key keymap (kbd "C-x L C-f") #'buffer-sets-load-definitions-file)
+    (define-key keymap (kbd "C-x L C-s") #'buffer-sets-save-definitions)
     keymap)
   "Keymap for buffer-set commands.")
 
 ;;;###autoload
 (define-minor-mode buffer-sets-mode
   "A mode for managing sets of buffers."
-  :lighter " BSM" :global t :variable buffer-sets-mode-p
+  :lighter " BSM" :global t :variable buffer-sets-mode-p :keymap buffer-sets-mode-map
   (if buffer-sets-mode-p
       (progn
         (buffer-sets-load-definitions-file)
-        (define-key ctl-x-map (kbd "L") buffer-sets-map)
         (add-hook 'kill-emacs-hook #'buffer-sets-unload-all-buffer-sets)
         (add-hook 'kill-emacs-hook #'buffer-sets-save-definitions))
     (progn
       (buffer-sets-save-definitions)
-      (define-key ctl-x-map (kbd "L") nil)
       (remove-hook 'kill-emacs-hook #'buffer-sets-unload-all-buffer-sets)
       (remove-hook 'kill-emacs-hook #'buffer-sets-save-definitions))))
 
