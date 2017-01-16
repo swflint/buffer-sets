@@ -1,3 +1,5 @@
+# Buffer Sets has moved [here](https://git.flintfam.org/swf-projects/buffer-sets)!
+
 This is Buffer Layers, a simple, layer-based buffer management system.
 
 It works by defining buffer layers using a fairly simple macro.  The following would be put in a file called `org.layer`
